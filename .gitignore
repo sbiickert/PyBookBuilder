@@ -1,3 +1,9 @@
 .mypy_cache/
 Archive/
 __pycache__/
+.DS_Store
+*.log
+Pride_And_Prejudice/PDF/scene.md
+Pride_And_Prejudice/PDF/scene.pdf
+bookanalytics.log
+.DS_Store
