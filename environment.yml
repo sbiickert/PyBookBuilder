@@ -1,0 +1,47 @@
+name: book
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - astroid=2.3.3=py37_0
+  - attrs=19.3.0=py_0
+  - ca-certificates=2020.6.24=0
+  - certifi=2020.6.20=py37_0
+  - click=7.1.2=py_0
+  - isort=4.3.21=py37_0
+  - joblib=0.16.0=py_0
+  - lazy-object-proxy=1.4.3=py37h1de35cc_0
+  - libcxx=4.0.1=hcfea43d_1
+  - libcxxabi=4.0.1=hcfea43d_1
+  - libedit=3.1.20181209=hb402a30_0
+  - libffi=3.2.1=h475c297_4
+  - markdown-it-py=0.4.9=py_0
+  - mccabe=0.6.1=py37_1
+  - mypy=0.750=py_0
+  - mypy_extensions=0.4.3=py37_0
+  - ncurses=6.2=h0a44026_0
+  - nltk=3.5=py_0
+  - openssl=1.1.1g=h1de35cc_0
+  - pip=20.0.2=py37_1
+  - psutil=5.7.0=py37h1de35cc_0
+  - pylint=2.4.4=py37_0
+  - python=3.7.6=h359304d_2
+  - python_abi=3.7=1_cp37m
+  - readline=7.0=h1de35cc_5
+  - regex=2020.7.14=py37haf1e3a3_0
+  - rope=0.17.0=py_0
+  - setuptools=46.1.1=py37_0
+  - six=1.14.0=py37_0
+  - sqlite=3.31.1=ha441bb4_0
+  - tk=8.6.8=ha441bb4_0
+  - tqdm=4.48.2=py_0
+  - typed-ast=1.4.1=py37h1de35cc_0
+  - typing=3.6.4=py37_0
+  - typing_extensions=3.7.4.1=py37_0
+  - wheel=0.34.2=py37_0
+  - wrapt=1.12.1=py37h1de35cc_1
+  - xz=5.2.4=h1de35cc_4
+  - zlib=1.2.11=h1de35cc_3
+  - pip:
+    - npyscreen==4.10.5
+prefix: /Users/sbiickert/miniconda3/envs/book
