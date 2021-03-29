@@ -14,7 +14,7 @@ from typing import Optional, List, Dict, Any
 
 import npyscreen
 
-from booklib import BookDatabase, Book, Chapter, Scene, BookFileModifiedException
+from booklib import BookDatabase, Book, Chapter, Scene, BookFileModifiedException, Character
 
 # Section ASCII art from https://onlineasciitools.com/convert-text-to-ascii-art
 
@@ -226,12 +226,13 @@ class BookInfoForm(npyscreen.ActionForm):
             name="Genres:",
             max_height=15,
             editable=True)
-        self.add(npyscreen.TitleFixedText,
-            name="Characters:")
         self.characters_text = self.add(
-            npyscreen.MultiLineEdit,
-            height=8,
-            editable=False)
+            npyscreen.TitleFixedText,
+            name="Characters:")
+        self.edit_characters = self.add(
+            npyscreen.ButtonPress,
+            name='Edit Character List',
+            when_pressed_function=self.on_edit_characters)
         self.nextrely = self.nextrely + 1
         self.open_dir_button = self.add(
             npyscreen.ButtonPress,
@@ -267,15 +268,15 @@ class BookInfoForm(npyscreen.ActionForm):
             if known_genre in book.genres:
                 selected_indexes.append(idx)
         self.genres_multiselect.value = selected_indexes
-        # Need to wrap the text of the character list, because autowrap doesn't seem to work.
-        my_wrap = textwrap.TextWrapper(width=self.characters_text.maximum_display_width)
-        all_characters = book.major_characters + book.minor_characters
-        all_characters = ", ".join(map(lambda character: character.name, all_characters))
-        self.characters_text.value = my_wrap.fill(text=all_characters)
+        self.characters_text.value = f'{len(book.major_characters)} major and {len(book.minor_characters)} minor.'
 
     def open_directory(self):
         book: Book = self.value
         subprocess.run([MARKDOWN_EDITOR, book.path()], check=True)
+    
+    def on_edit_characters(self):
+        self.parentApp.getForm("CHAR_LIST").value = self.value
+        self.parentApp.switchForm("CHAR_LIST")
 
     def on_ok(self):
         book: Book = self.value
@@ -320,6 +321,185 @@ class BookInfoForm(npyscreen.ActionForm):
     def on_cancel(self):
         self.parentApp.switchForm(self.next_form_name)
 
+
+#  .o88b. db   db  .d8b.  d8888b.  .d8b.   .o88b. d888888b d88888b d8888b.   db      d888888b .d8888. d888888b 
+# d8P  Y8 88   88 d8' `8b 88  `8D d8' `8b d8P  Y8 `~~88~~' 88'     88  `8D   88        `88'   88'  YP `~~88~~' 
+# 8P      88ooo88 88ooo88 88oobY' 88ooo88 8P         88    88ooooo 88oobY'   88         88    `8bo.      88    
+# 8b      88~~~88 88~~~88 88`8b   88~~~88 8b         88    88~~~~~ 88`8b     88         88      `Y8b.    88    
+# Y8b  d8 88   88 88   88 88 `88. 88   88 Y8b  d8    88    88.     88 `88.   88booo.   .88.   db   8D    88    
+#  `Y88P' YP   YP YP   YP 88   YD YP   YP  `Y88P'    YP    Y88888P 88   YD   Y88888P Y888888P `8888Y'    YP    
+
+class CharacterListForm(npyscreen.ActionForm):
+    """Form that shows and edits the list of characters"""
+    # pylint: disable=too-many-instance-attributes
+    # pylint: disable=attribute-defined-outside-init
+    # pylint: disable=too-many-ancestors
+    def create(self):
+        """Called after __init__ and creates all UI elements in the form."""
+        self.value = None
+        self.major_select = self.add(
+            npyscreen.TitleSelectOne, #TitleMultiLine
+            name='Major:',
+            editable=True, max_height=33, max_width=50)
+        self.major_new_button = self.add(
+            npyscreen.ButtonPress,
+            name='New Major Character',
+            when_pressed_function=self.on_new_major)
+        self.major_edit_button = self.add(
+            npyscreen.ButtonPress,
+            name='Edit Major Character',
+            when_pressed_function=self.on_edit_major)
+        self.major_delete_button = self.add(
+            npyscreen.ButtonPress,
+            name='Delete Major Character',
+            when_pressed_function=self.on_delete_major)
+        self.nextrelx = 55
+        self.nextrely = 2
+        self.minor_select = self.add(
+            npyscreen.TitleSelectOne,
+            name='Minor:',
+            editable=True, max_height=33)
+        self.minor_new_button = self.add(
+            npyscreen.ButtonPress,
+            name='New Minor Character',
+            when_pressed_function=self.on_new_minor)
+        self.minor_edit_button = self.add(
+            npyscreen.ButtonPress,
+            name='Edit Minor Character',
+            when_pressed_function=self.on_edit_minor)
+        self.minor_delete_button = self.add(
+            npyscreen.ButtonPress,
+            name='Delete Minor Character',
+            when_pressed_function=self.on_delete_minor)
+ 
+    def beforeEditing(self):
+        """Called before the form is shown"""
+        # pylint: disable=invalid-name
+        # self.value will be Book. Book has major_characters and minor_characters
+        self.update_content()
+        self.parentApp.setNextForm("BOOK_INFO")
+        self.keypress_timeout = 10
+
+    def update_content(self):
+        book: Book = self.value
+        self.major_select.values = list(map(lambda ch: ch.name, book.major_characters))
+        self.minor_select.values = list(map(lambda ch: ch.name, book.minor_characters))
+
+    def while_waiting(self):
+        try:
+            book: Book = self.value
+            book.guard_against_editing_modified_file()
+        except BookFileModifiedException:
+            book.reopen_file()
+            self.update_content()
+            self.display()
+    
+    def on_new_major(self):
+        book:Book = self.value
+        new_character = Character()
+        book.major_characters.append(new_character)
+        self.parentApp.getForm("CHAR_INFO").value = new_character
+        self.parentApp.switchForm("CHAR_INFO")
+
+    def on_edit_major(self):
+        book:Book = self.value
+        if len(self.major_select.value) > 0:
+            selected_idx = self.major_select.value[0]
+            selected_character = book.major_characters[selected_idx]
+            self.parentApp.getForm("CHAR_INFO").value = selected_character
+            self.parentApp.switchForm("CHAR_INFO")
+    
+    def on_delete_major(self):
+        book:Book = self.value
+        if len(self.major_select.value) > 0:
+            selected_idx = self.major_select.value[0]
+            selected_character = book.major_characters[selected_idx]
+            # Confirm
+            if npyscreen.notify_ok_cancel(f'Delete {selected_character.name}?', 'Confirm Delete'):
+                del book.major_characters[selected_idx]
+                self.major_select.values = list(map(lambda ch: ch.name, book.major_characters))
+                self.major_select.value = []
+                self.display()
+    
+    def on_new_minor(self):
+        book:Book = self.value
+        new_character = Character()
+        book.minor_characters.append(new_character)
+        self.parentApp.getForm("CHAR_INFO").value = new_character
+        self.parentApp.switchForm("CHAR_INFO")
+
+    def on_edit_minor(self):
+        book:Book = self.value
+        if len(self.minor_select.value) > 0:
+            selected_idx = self.minor_select.value[0]
+            selected_character = book.minor_characters[selected_idx]
+            self.parentApp.getForm("CHAR_INFO").value = selected_character
+            self.parentApp.switchForm("CHAR_INFO")
+    
+    def on_delete_minor(self):
+        book:Book = self.value
+        if len(self.minor_select.value) > 0:
+            selected_idx = self.minor_select.value[0]
+            selected_character = book.minor_characters[selected_idx]
+            # Confirm
+            if npyscreen.notify_ok_cancel(f'Delete {selected_character.name}?', 'Confirm Delete'):
+                del book.minor_characters[selected_idx]
+                self.minor_select.values = list(map(lambda ch: ch.name, book.minor_characters))
+                self.minor_select.value = []
+                self.display()
+
+    def on_ok(self):
+        book:Book = self.value
+        book.save_to_file()
+
+    def on_cancel(self):
+        book:Book = self.value
+        book.open_file()
+
+
+
+#  .o88b. db   db  .d8b.  d8888b.  .d8b.   .o88b. d888888b d88888b d8888b. 
+# d8P  Y8 88   88 d8' `8b 88  `8D d8' `8b d8P  Y8 `~~88~~' 88'     88  `8D 
+# 8P      88ooo88 88ooo88 88oobY' 88ooo88 8P         88    88ooooo 88oobY' 
+# 8b      88~~~88 88~~~88 88`8b   88~~~88 8b         88    88~~~~~ 88`8b   
+# Y8b  d8 88   88 88   88 88 `88. 88   88 Y8b  d8    88    88.     88 `88. 
+#  `Y88P' YP   YP YP   YP 88   YD YP   YP  `Y88P'    YP    Y88888P 88   YD 
+                                                                         
+class CharacterForm(npyscreen.ActionPopupWide):
+    """Form that shows and edits a character"""
+    # pylint: disable=too-many-instance-attributes
+    # pylint: disable=attribute-defined-outside-init
+    # pylint: disable=too-many-ancestors
+    def create(self):
+        """Called after __init__ and creates all UI elements in the form."""
+        self.value = None
+        self.name_text = self.add(
+            npyscreen.TitleText,
+            name='Name:',
+            editable=True)
+        self.description_text = self.add(
+            npyscreen.TitleText,
+            name='Description:',
+            editable=True)
+        self.alias_text = self.add(
+            npyscreen.TitleText,
+            name='Aliases:',
+            editable=True)
+    
+    def beforeEditing(self):
+        # pylint: disable=invalid-name
+        """Called before the form is shown."""
+        character:Character = self.value
+        self.name_text.value = character.name
+        self.description_text.value = character.description
+        self.alias_text.value = ", ".join(character.aliases)
+        self.parentApp.setNextForm("CHAR_LIST")
+    
+    def on_ok(self):
+        character:Character = self.value
+        character.name = self.name_text.value
+        character.description = self.description_text.value
+        character.aliases = self.alias_text.value.split(', ')
 
 
 # d8888b.  .d88b.   .d88b.  db   dD    .o88b.  .d88b.  d8b   db d888888b d88888b d8b   db d888888b 
@@ -384,7 +564,6 @@ class BookContentList(npyscreen.MultiLineAction):
             "^A": self.parent.on_analyze,
             "^P": self.parent.on_print,
             "^X": self.parent.on_delete_chapter,
-            "^H": self.parent.show_help,
             "^W": self.parent.close_book,
             "^Q": self.parent.parentApp.quit
         })
@@ -698,7 +877,7 @@ class SceneForm(npyscreen.ActionForm):
         self.status_select = self.add(
             npyscreen.TitleSelectOne,
             name='Revision Status:',
-            editable=True, max_height=5,
+            editable=True, max_height=6,
             values=self.parentApp.lists['status'])
         self.nextrely = self.nextrely + 1
         self.pov_select = self.add(
@@ -848,6 +1027,8 @@ class BookBuilderApp(npyscreen.NPSAppManaged):
         self.addForm("CHAPTER_INFO", ChapterForm, name="Information About the Chapter")
         self.addForm("SCENE_INFO", SceneForm, name="Information About the Scene")
         self.addForm("HELP", HelpForm, name="Help")
+        self.addForm("CHAR_LIST", CharacterListForm, name="List of Characters")
+        self.addForm("CHAR_INFO", CharacterForm, name="Information About the Character")
 
     def load_lists(self):
         with open(LISTS_FILE) as lists_file:
