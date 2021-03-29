@@ -1,0 +1,28 @@
+Welcome to PyBookBuilder's Book Content Screen
+==============================================
+
+COMMANDS - You can also use Ctrl-N instead of :n, etc.
+
+	:h - Help. Opens this screen
+	:n - New chapter. Shows chapter info screen, appends to the end of the book.
+	:u - Move Up. Reorders the selected chapter or scene towards the front of the book.
+	:d - Move Down. Reorders the selected chapter or scene towards the end of the book.
+	:i - Get Info. Opens the metadata screen for the selected Book, Chapter or Scene.
+	:a - Analyze scene. Determines readability and exports to PDF with markup.
+	:p - Print. Exports the book to PDF.
+	:r - Refresh. Reloads the list of book content
+	:w - Close the book content screen, go back to the book list.
+	:q - Quit
+	:x - Delete chapter. Will prompt to confirm.
+
+
+SEARCHING
+
+Search has full regular expression capabilities. Start with / and then type.
+
+OPENING for EDITING
+
+Select the Chapter or Scene you want by navigating up and down and/or searching. Press Enter.
+
+This will open the book in the external editor to the selected Chapter or Scene.
+Saved changes in the external editor will show up here.

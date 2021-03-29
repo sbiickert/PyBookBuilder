@@ -1,0 +1,23 @@
+{
+	"genres": [
+		"Fantasy",
+		"Science Fiction",
+		"Horror",
+		"Western",
+		"Romance",
+		"Thriller",
+		"Mystery",
+		"Detective",
+		"Dystopia",
+		"Memoir",
+		"Biography",
+		"Satire",
+		"Young Adult"
+	],
+	"status": [
+		"Rough",
+		"In Progress",
+		"Good",
+		"Finished"
+	]
+}

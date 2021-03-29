@@ -1,0 +1,6 @@
+{
+    "python.pythonPath": "/Users/sbiickert/miniconda3/envs/book/bin/python",
+    "python.linting.pylintEnabled": false,
+    "python.linting.mypyEnabled": true,
+    "python.linting.enabled": true
+}

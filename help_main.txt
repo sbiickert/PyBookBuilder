@@ -1,0 +1,18 @@
+Welcome to PyBookBuilder
+========================
+
+COMMANDS - You can also use Ctrl-N instead of :n, etc.
+
+	:h - Help. Opens this screen
+	:n - New book. Will open book metadata screen. Need to have directory created already.
+	:i - Get Info. Opens the book metadata screen.
+	:p - Print. Exports the selected book to PDF.
+	:r - Refresh. Reloads the list of books from the database
+	:q - Quit
+	:x - Delete book. Will prompt to confirm, and will archive the book first.
+	
+
+OPENING
+
+Select the book you want by navigating up and down. Press Enter.
+This will open the book content page.
