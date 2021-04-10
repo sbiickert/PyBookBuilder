@@ -32,5 +32,6 @@ I use conda to manage the python virtual environment. There is an environment.ym
 1. [npyscreen](https://npyscreen.readthedocs.io): widget library built on top on ncurses
 2. [markdown-it-py](https://pypi.org/project/markdown-it-py/): Markdown parser/tokenizer
 3. [nltk](https://www.nltk.org): Natural language toolkit used to evaluate grammar
+4. [pandoc](https://pandoc.org): Universal document converter. To turn markdown into PDF.
 
 Thanks for looking. Drop me a note if you find this useful.
