@@ -9,7 +9,7 @@ import re
 import subprocess
 import textwrap
 
-from copy import copy
+from copy import copy, deepcopy
 from typing import Optional, List, Dict, Any
 
 import npyscreen
@@ -688,9 +688,12 @@ class BookForm(npyscreen.FormMuttActiveTraditional):
         selected_object = self.get_selected_object()
         if isinstance(selected_object, Scene):
             scene: Scene = selected_object
-            scene.analyze()
-            self.parentApp.print_scene(scene)
-            scene.clear_markup()
+            # Work on a copy so we don't have to clear markup
+            copied_scene = deepcopy(scene)
+            copied_scene.analyze()
+            self.parentApp.print_scene(copied_scene)
+            #scene.clear_markup()
+            
             self.update_display()
 
     def on_get_info(self, ctrl_arg=None):
@@ -954,9 +957,13 @@ class SceneForm(npyscreen.ActionForm):
     def on_analyze(self):
         scene: Optional[Scene] = self.value
         if scene is not None:
-            scene.analyze()
-            self.parentApp.print_scene(scene)
-            scene.clear_markup()
+            # Work on a copy, so we don't have to clear out the markup after printing
+            copied_scene = deepcopy(scene)
+            copied_scene.analyze()
+            self.parentApp.print_scene(copied_scene)
+            scene.analytic_info = copied_scene.analytic_info
+            #scene.clear_markup()
+
             self.update_analytic_display()
             self.display()
 
