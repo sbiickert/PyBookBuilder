@@ -3,7 +3,7 @@
 
 ## Project Status
 
-This project is continuing to evolve. It is a personal solution to a problem (aren't all programs?) and I will continue to make changes as I use it. If you would like to make contributions, I will do my best, but I am not skilled with GitHub.
+This project is paused. I have shifted to making a native MacOS application called [BookFramer](https://github.com/sbiickert/BookFramer). If you would like to make contributions, I will do my best to help you out, but I am not skilled with GitHub.
 
 ## What is it?
 
